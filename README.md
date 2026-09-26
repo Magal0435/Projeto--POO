@@ -1,52 +1,80 @@
 # Projeto--POO
 # TEMA 2: SISTEMA DE GERENCIAMENTO DE FROTA DE VEÍCULOS
-# Descrição do projeto
-Projeto que busca criar um sistema de linha de comando para gerenciar veículos
-# Objetivo
-Desenvolver um sistema de linha de comando para gerenciar a frota de veículos de uma empresa de transporte.
-# Funções
-## 1. Cadastro de veículos
-Criar, ler, atualizar e excluir (CRUD) veículos.\
-Campos mínimos: placa, marca, modelo, tipo (carro, moto, caminhão), ano, quilometragem, consumo médio (km/l), status (ativo, manutenção, inativo).\
-Registrar histórico de eventos: entrada, saída, manutenção, abastecimento, desativação.
-## 2. Cadastro de motoristas
-Criar, listar, editar e remover motoristas.\
-Campos: nome, CPF, categoria da CNH, tempo de experiência (anos), disponibilidade, histórico de viagens.\
-Validação automática: só pode dirigir veículos compatíveis com sua categoria.
-## 3. Manutenções
-Registrar manutenções: data, tipo (preventiva/corretiva), custo, descrição.\
-Associar a um veículo e armazenar no histórico.\
-Calcular custo médio de manutenção por tipo de veículo.\
-Permitir marcar veículo como em manutenção e liberá-lo ao concluir o serviço.
-## 4. Abastecimentos
-Registrar abastecimentos: data, tipo de combustível, litros, valor pago.\
-Calcular consumo médio por veículo (km/l).\
-Exibir veículos com consumo fora do padrão definido.
-## 5. Alocação de veículos
-Associar veículo a um motorista e registrar viagem: origem, destino, distância percorrida.\
-Atualizar quilometragem automaticamente após cada viagem.\
-Bloquear alocação se o veículo estiver em manutenção ou inativo.
-## 6. Relatórios
-Custo total e médio de manutenção por tipo de veículo.\
-Ranking de veículos por eficiência de combustível.\
-Total de viagens por motorista.\
-Quilometragem média por tipo de veículo.
-## 7. Configurações
-Arquivo settings.json com políticas e parâmetros como:\
-Limite de quilometragem para revisão preventiva.\
-Faixa aceitável de consumo médio (km/l).\
-Custos por tipo de manutenção.\
-Categoria mínima de CNH por tipo de veículo.
 
-# Modelagem
-## Classes
-### Veículo: 
-Atributos: Modelo, marca, placa, tipo, ano, quilometragem, consumo médio
-### Pessoa: 
-Atributos: Nome, CPF, função
-### Motorista:
-Atributo: Nome(herança de pessoa), função (herança de pessoa), categoria da CNH, tempo de experiência (anos), disponibilidade, veículo
-### Manutenção:
-Atributos: Status de manutenção, data, veículo, custo, tipo de manutenção  
-### Relatório:
-Atributos: Nome do relatório, data de criação, dados
+## 1. Descrição do Projeto
+Projeto que busca criar um sistema de linha de comando (CLI) ou uma API mínima (como FastAPI ou Flask) para gerenciar a frota de veículos de uma empresa de transporte. O sistema aplica conceitos de Programação Orientada a Objetos, como encapsulamento, herança (simples e múltipla), métodos especiais e regras de negócio configuráveis, utilizando persistência de dados em JSON ou SQLite com um repositório desacoplado do domínio.
+
+## 2. Objetivo
+Centralizar o cadastro e o controle de veículos e motoristas, permitindo registrar viagens, manutenções e abastecimentos, além de calcular custos médios e disponibilizar relatórios de desempenho.
+
+## 3. Estrutura Planejada de Classes (UML Textual)
+
+### 3.1. Diagrama de Relacionamentos
+```text
+                         Pessoa
+                           │
+                           ▼
+                       Motorista
+                           │
+                           │ realiza
+                           ▼
+                         Viagem
+                        /      \
+                       /        \
+                      ▼          ▼
+                  Veiculo ◄──── Motorista
+                    │
+          ┌─────────┼─────────┐
+          ▼         ▼         ▼
+        Carro      Moto    Caminhao
+          │         │         │
+          └─────────┼─────────┘
+                    │
+             ┌──────┴──────┐
+             ▼             ▼
+   AbastecivelMixin  ManutenivelMixin
+```
+* **Veiculo** possui relacionamentos (históricos) com as classes **Manutencao**, **Abastecimento** e **Viagem**.
+
+### 3.2. Classes, Atributos e Métodos
+
+#### Veiculo (Classe Base)
+* **Atributos (privados com `@property`):** `_placa`, `_marca`, `_modelo`, `_tipo`, `_ano`, `_quilometragem`, `_consumo_medio`, `_status` (Enum: ATIVO, MANUTENCAO, INATIVO).
+* **Métodos Principais:** `atualizar_quilometragem(distancia: float)`, `alterar_status(novo_status)`, `registrar_evento(evento)`.
+* **Métodos Especiais:**
+    * `__str__()` / `__repr__()`: Retorna um resumo legível do veículo.
+    * `__eq__()`: Compara a igualdade de veículos utilizando a placa.
+    * `__lt__()`: Permite ordenar os veículos pela quilometragem.
+    * `__iter__()`: Permite iterar sobre o histórico de manutenções/eventos do veículo.
+
+#### Especializações de Veículo (Herança Simples)
+* **Carro(Veiculo)**
+* **Moto(Veiculo)**
+* **Caminhao(Veiculo)**
+
+#### Mixins (Herança Múltipla)
+* **AbastecivelMixin:**
+    * **Atributos:** `_historico_abastecimentos`
+    * **Métodos:** `abastecer(abastecimento: Abastecimento)`
+* **ManutenivelMixin:**
+    * **Atributos:** `_historico_manutencoes`
+    * **Métodos:** `registrar_manutencao(manutencao: Manutencao)`
+
+#### Pessoa e Motorista
+* **Pessoa (Classe Base):**
+    * **Atributos:** `_nome`, `_cpf`, `_funcao`
+* **Motorista(Pessoa):**
+    * **Atributos Adicionais:** `_categoria_cnh`, `_experiencia_anos`, `_disponibilidade`, `_historico_viagens`
+    * **Métodos:** `adicionar_viagem(viagem: Viagem)`, `verificar_compatibilidade(tipo_veiculo)`
+
+#### Entidades de Transação
+* **Viagem:**
+    * **Atributos:** `_motorista`, `_veiculo`, `_origem`, `_destino`, `_distancia`, `_data`
+* **Manutencao:**
+    * **Atributos:** `_data`, `_tipo` (Preventiva ou Corretiva), `_custo`, `_descricao`, `_veiculo`, `_status`
+* **Abastecimento:**
+    * **Atributos:** `_data`, `_tipo_combustivel`, `_litros`, `_valor_pago`, `_veiculo`, `_quilometragem_momento`
+
+#### Exceções Customizadas
+* `ManutencaoInvalidaError`, `AlocacaoInvalidaError`, `PoliticaNaoAtendidaError`, `RepositorioError`.
+
