@@ -7,37 +7,7 @@ Projeto que busca criar um sistema de linha de comando (CLI) ou uma API mínima 
 ## 2. Objetivo
 Centralizar o cadastro e o controle de veículos e motoristas, permitindo registrar viagens, manutenções e abastecimentos, além de calcular custos médios e disponibilizar relatórios de desempenho.
 
-## 3. Estrutura Planejada de Classes (UML Textual)
-
-### 3.1. Diagrama de Relacionamentos
-```text
-                         Pessoa
-                           │
-                           ▼
-                       Motorista
-                           │
-                           │ realiza
-                           ▼
-                         Viagem
-                        /      \
-                       /        \
-                      ▼          ▼
-                  Veiculo ◄──── Motorista
-                    │
-          ┌─────────┼─────────┐
-          ▼         ▼         ▼
-        Carro      Moto    Caminhao
-          │         │         │
-          └─────────┼─────────┘
-                    │
-             ┌──────┴──────┐
-             ▼             ▼
-   AbastecivelMixin  ManutenivelMixin
-```
-* **Veiculo** possui relacionamentos (históricos) com as classes **Manutencao**, **Abastecimento** e **Viagem**.
-
-### 3.2. Classes, Atributos e Métodos
-
+## 3. Classes, Atributos e Métodos
 #### Veiculo (Classe Base)
 * **Atributos (privados com `@property`):** `_placa`, `_marca`, `_modelo`, `_tipo`, `_ano`, `_quilometragem`, `_consumo_medio`, `_status` (Enum: ATIVO, MANUTENCAO, INATIVO).
 * **Métodos Principais:** `atualizar_quilometragem(distancia: float)`, `alterar_status(novo_status)`, `registrar_evento(evento)`.
