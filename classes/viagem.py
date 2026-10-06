@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Viagem:
     """
     Representa uma viagem realizada pela frota.
